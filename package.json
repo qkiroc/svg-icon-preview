@@ -21,15 +21,21 @@
 				"title": "展示图标列表"
 			}
 		],
-		"menus": {
-			"editor/context": [
+		"viewsContainers": {
+			"activitybar": [
 				{
-					"command": "svgPreview.showSvgList",
-					"group": "1_modification"
-				},
+					"id": "svgIconList",
+					"title": "图标列表",
+					"icon": "media/icon.svg"
+				}
+			]
+		},
+		"views": {
+			"svgIconList": [
 				{
-					"command": "svgPreview.showSvgList",
-					"group": "navigation"
+					"type": "webview",
+					"id": "svgIconList",
+					"name": "svgIconList"
 				}
 			]
 		}

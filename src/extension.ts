@@ -1,8 +1,120 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs';
 
-export function activate(context: vscode.ExtensionContext) {
-  function getWebviewContent(icon: any) {
+interface iconConfig {
+  name: string;
+  iconPath: string;
+}
+interface iconConfigList extends iconConfig {
+  rootPath: string;
+}
+
+class ColorsViewProvider implements vscode.WebviewViewProvider {
+  private iconConfigList: iconConfigList[] = [];
+  private view?: vscode.WebviewView;
+
+  public resolveWebviewView(
+    webviewView: vscode.WebviewView,
+    context: vscode.WebviewViewResolveContext,
+    _token: vscode.CancellationToken
+  ) {
+    webviewView.webview.options = {
+      enableScripts: true
+    };
+    this.view = webviewView;
+
+    this.getIconConfig();
+    this.render();
+  }
+
+  public render() {
+    const iconConfig = this.getIconInfo();
+    if (iconConfig) {
+      const html = this.getWebviewContent(iconConfig);
+      this.view!.webview.html = html;
+    } else {
+      this.renderNullData();
+    }
+  }
+
+  /**
+   * 获取当前文件的可使用的图标
+   */
+  private getIconInfo() {
+    const editor = vscode.window.activeTextEditor; // 获取当前文档实例
+    if (editor) {
+      const currentUri = editor.document.uri.path; // 获取当前文档地址
+      const currentIconConfig = this.iconConfigList.find(item => {
+        if (currentUri.includes(path.join(item.rootPath, item.name) + '/')) {
+          return item;
+        }
+      });
+      if (currentIconConfig) {
+        const iconPath = path.join(currentIconConfig.rootPath, currentIconConfig.iconPath);
+        const code = fs.readFileSync(path.join(iconPath), 'utf8');
+        const iconList = code.match(/import .* from '.*\.svg'/g);
+        const registerIconList = code.match(/registerIcon\('(.*)', (.*)\)/g);
+        const iconConfig: any = [];
+        if (iconList && iconList.length > 0 && registerIconList && registerIconList.length > 0) {
+          const registerIconInfo: any = {};
+          registerIconList.forEach(code => {
+            const info = /registerIcon\('(.*)', (.*)\)/.exec(code);
+            if (info) {
+              registerIconInfo[info[2]] = info[1];
+            }
+          });
+          iconList.forEach(code => {
+            const info = /import (.*) from '(.*\.svg)'/.exec(code);
+            if (info) {
+              const aPath = path.resolve(iconPath, '../' + info[2]);
+              iconConfig.push({
+                class: info[1],
+                name: registerIconInfo[info[1]],
+                path: info[2],
+                aPath: aPath
+              });
+            }
+          });
+          return iconConfig;
+        } else {
+          this.renderNullData();
+        }
+      } else {
+        this.renderNullData();
+      }
+    } else {
+      this.renderNullData();
+    }
+  }
+
+  private renderNullData() {
+    this.view!.webview.html = '<div style="margin: 20px;text-align: center;">暂无可用图标</div>';
+  }
+
+  /**
+   * 获取项目图标配置
+   */
+  private getIconConfig() {
+    const rootWorkspace = vscode.workspace.workspaceFolders;
+    rootWorkspace?.forEach(workspaceFolder => {
+      const uri = workspaceFolder.uri.path;
+      const iconConfigFile = fs.readFileSync(path.join(uri, '.vscode/iconConfig.json'), 'utf-8');
+      if (iconConfigFile) {
+        const iconConfig = JSON.parse(iconConfigFile);
+        iconConfig.forEach((info: iconConfig) => {
+          this.iconConfigList.push({
+            rootPath: uri,
+            ...info
+          });
+        });
+      }
+    });
+  }
+  /**
+   * 绘制html
+   */
+  private getWebviewContent(icon: any) {
     return `
         <!DOCTYPE html>
         <html lang="en">
@@ -92,50 +204,13 @@ export function activate(context: vscode.ExtensionContext) {
       </html>
     `;
   }
-  let disposable = vscode.commands.registerCommand('svgPreview.showSvgList', () => {
-    const panel = vscode.window.createWebviewPanel(
-      'showSvgList', // 只供内部使用，这个webview的标识
-      '图标列表', // 给用户显示的面板标题
-      vscode.ViewColumn.Two, // 在侧边显示
-      {
-        enableScripts: true // 允许执行js
-      }
-    );
-
-    const editor = vscode.window.activeTextEditor; // 获取当前文档实例
-    if (editor) {
-      const currentUri = editor.document.uri; // 获取当前文档地址
-      const code = editor.document.getText(); // 获取文档内容
-      const iconList = code.match(/import .* from '.*\.svg'/g);
-      const registerIconList = code.match(/registerIcon\('(.*)', (.*)\)/g);
-      const iconInfo: any = [];
-      if (iconList && iconList.length > 0 && registerIconList && registerIconList.length > 0) {
-        const registerIconInfo: any = {};
-        registerIconList.forEach(code => {
-          const info = /registerIcon\('(.*)', (.*)\)/.exec(code);
-          if (info) {
-            registerIconInfo[info[2]] = info[1];
-          }
-        });
-        iconList.forEach(code => {
-          const info = /import (.*) from '(.*\.svg)'/.exec(code);
-          if (info) {
-            const aPath = path.resolve(currentUri.path, '../' + info[2]);
-            iconInfo.push({
-              class: info[1],
-              name: registerIconInfo[info[1]],
-              path: info[2],
-              aPath: aPath
-            });
-          }
-        });
-        // 绘制html
-        panel.webview.html = getWebviewContent(iconInfo);
-      }
-    }
-  });
-
-  context.subscriptions.push(disposable);
 }
 
-export function deactivate() {}
+export function activate(context: vscode.ExtensionContext) {
+  const provider = new ColorsViewProvider();
+  context.subscriptions.push(vscode.window.registerWebviewViewProvider('svgIconList', provider));
+  // 文件改变重新渲染图标列表
+  vscode.window.onDidChangeActiveTextEditor(() => {
+    provider.render();
+  });
+}
