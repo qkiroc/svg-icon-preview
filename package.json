@@ -3,7 +3,7 @@
 	"displayName": "svg icon preview",
 	"description": "",
 	"publisher": "qhy",
-	"version": "0.0.1",
+	"version": "0.0.3",
 	"engines": {
 		"vscode": "^1.46.0"
 	},
@@ -19,6 +19,16 @@
 			{
 				"command": "svgPreview.showSvgList",
 				"title": "展示图标列表"
+			},
+			{
+				"command": "svgPreview.reload",
+				"title": "刷新列表",
+				"icon": "media/reload.svg"
+			},
+			{
+				"command": "svgPreview.openRegisterFile",
+				"title": "打开图标注册文件",
+				"icon": "media/file.svg"
 			}
 		],
 		"viewsContainers": {
@@ -36,6 +46,27 @@
 					"type": "webview",
 					"id": "svgIconList",
 					"name": "svgIconList"
+				}
+			],
+			"explorer": [
+				{
+					"type": "webview",
+					"id": "explorer-svgIconList",
+					"name": "图标列表"
+				}
+			]
+		},
+		"menus": {
+			"view/title": [
+				{
+					"command": "svgPreview.reload",
+					"group": "navigation",
+					"when": "view === svgIconList"
+				},
+				{
+					"command": "svgPreview.openRegisterFile",
+					"group": "navigation",
+					"when": "view === svgIconList"
 				}
 			]
 		}
