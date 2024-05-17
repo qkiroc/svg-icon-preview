@@ -18,7 +18,7 @@
     const target = e.target;
     const name = target.getAttribute('icon-name');
     if (name) {
-      const text = `<Icon icon="\${name}" className="icon" />`;
+      const text = `<Icon icon="${name}" className="icon" />`;
       const toast = document.getElementById('toast');
       toast.style = 'top: 40px';
       setTimeout(() => {
