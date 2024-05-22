@@ -3,7 +3,7 @@
 	"displayName": "svg icon preview",
 	"description": "",
 	"publisher": "qhy",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"engines": {
 		"vscode": "^1.46.0"
 	},
