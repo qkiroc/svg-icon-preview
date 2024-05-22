@@ -1,9 +1,9 @@
 {
-	"name": "svg-icon-preview",
-	"displayName": "svg icon preview",
+	"name": "amis-icon-preview",
+	"displayName": "amis 项目图标预览",
 	"description": "",
-	"publisher": "qhy",
-	"version": "0.2.0",
+	"publisher": "qkiroc",
+	"version": "0.3.0",
 	"engines": {
 		"vscode": "^1.46.0"
 	},
