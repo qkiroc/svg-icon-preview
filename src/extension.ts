@@ -3,17 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import IconViewProvider from './IconViewProvider';
 
-interface DeleteIconInfo {
-  iconPath: string;
-  iconAPath: string;
-  iconName: string;
-  iconClass: string;
-  projectName: string;
-  configPath: string;
-  rootPath: string;
-}
-
-function deleteIconConfigImport(data: DeleteIconInfo) {
+function deleteIconConfigImport(data: MessageIconInfo) {
   const { iconPath, iconName, iconClass, configPath, rootPath } = data;
   const configAPath = path.join(rootPath, configPath);
   let code = fs.readFileSync(configAPath, 'utf-8');
@@ -42,15 +32,21 @@ export function activate(context: vscode.ExtensionContext) {
     provider.openRegisterFile();
   });
 
-  vscode.commands.registerCommand('svgIconList.delete', (data: DeleteIconInfo) => {
-    const { iconAPath, projectName } = data;
+  vscode.commands.registerCommand('svgIconList.delete', (data: MessageIconInfo) => {
+    const { iconAPath } = data;
     vscode.window
       .showInformationMessage('删除图标会同步删除引用和本地文件，确认是否删除？', '确认', '取消')
       .then(value => {
         if (value === '确认') {
           fs.unlink(iconAPath, () => {
-            provider.deleteIcon(iconAPath, projectName);
             deleteIconConfigImport(data);
+            provider.postMessage({
+              type: 'toast',
+              data: {
+                status: 'success',
+                message: '删除成功'
+              }
+            });
           });
         }
       });
