@@ -32,7 +32,9 @@ export default function EmptyComponent() {
               className="empty-tip-content-button"
               onClick={() => handleOpenProject(config.iconPath)}
             >
-              {config.name}
+              {config.name ||
+                projectConfig.rootPath?.split('/').pop() ||
+                '项目'}
             </div>
           ))}
       </div>

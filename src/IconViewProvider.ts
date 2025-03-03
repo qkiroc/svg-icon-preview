@@ -9,14 +9,16 @@ interface iconConfigList extends iconConfigProps {
 }
 
 class IconViewProvider implements vscode.WebviewViewProvider {
-  private iconConfigList: iconConfigList[] = [];
+  public iconConfigList: iconConfigList[] = [];
   private rootPath: string = '';
   private iconConfig: iconConfigProps[] = [];
   private view?: vscode.WebviewView;
   private currentIconConfig?: iconConfigList;
   private search: string = '';
 
-  constructor(private readonly _extensionUri: vscode.Uri) {}
+  constructor(private readonly _extensionUri: vscode.Uri) {
+    this.getIconConfig();
+  }
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -28,7 +30,6 @@ class IconViewProvider implements vscode.WebviewViewProvider {
     };
     this.view = webviewView;
 
-    this.getIconConfig();
     this.render();
     this.receiveMessage();
   }
@@ -109,7 +110,7 @@ class IconViewProvider implements vscode.WebviewViewProvider {
   /**
    * 获取当前文件的可使用的图标
    */
-  private getIconInfo() {
+  public getIconInfo() {
     const editor = vscode.window.activeTextEditor; // 获取当前文档实例
     if (editor) {
       const currentUri = editor.document.uri.path; // 获取当前文档地址
