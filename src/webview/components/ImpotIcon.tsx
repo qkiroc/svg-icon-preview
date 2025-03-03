@@ -34,7 +34,7 @@ export default function ImportIcon() {
   }
 
   function handleConfirm(values: any) {
-    const { name, needColor } = values;
+    const {name, needColor} = values;
     window.vscode.postMessage({
       type: 'importIcon',
       data: {
@@ -49,29 +49,40 @@ export default function ImportIcon() {
 
   return (
     <>
-      <Popover content='导入图标' placement='left' className='popover'>
-        <label className='import-icon'>
-          <input type='file' accept='.svg' onChange={handleImportIcon} />
+      <Popover content="导入图标" placement="left" className="popover">
+        <label className="import-icon">
+          <input type="file" accept=".svg" onChange={handleImportIcon} />
           <CreateIcon />
         </label>
       </Popover>
       {showModal && (
         <Modal
-          title='导入图标'
+          title="导入图标"
           open={true}
           onCancel={() => setShowModal(false)}
-          okButtonProps={{ autoFocus: true, htmlType: 'submit' }}
-          okText='确认'
-          cancelText='取消'
+          okButtonProps={{autoFocus: true, htmlType: 'submit'}}
+          okText="确认"
+          cancelText="取消"
           destroyOnClose
           modalRender={dom => (
-            <Form initialValues={file} onFinish={handleConfirm} form={form} clearOnDestroy>
+            <Form
+              initialValues={file}
+              onFinish={handleConfirm}
+              form={form}
+              clearOnDestroy
+            >
               {dom}
             </Form>
-          )}>
+          )}
+        >
           <Form.Item
-            label='图标名称'
-            name='name'
+            label="图标名称"
+            name="name"
+            layout="horizontal"
+            tooltip={{
+              title: '作为文件名和图标使用名',
+              placement: 'right'
+            }}
             rules={[
               {
                 validator(rule, value, callback) {
@@ -87,15 +98,32 @@ export default function ImportIcon() {
                   callback();
                 }
               }
-            ]}>
+            ]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name='needColor' label='保留颜色' tooltip='默认会将svg中的fill属性替换为currentColor'>
+          <Form.Item
+            name="needColor"
+            label="保留颜色"
+            tooltip={{
+              title:
+                '默认会将svg中的fill属性替换为currentColor，如要保留颜色请勾选',
+              placement: 'right'
+            }}
+            layout="horizontal"
+          >
             <Switch />
           </Form.Item>
-          <Form.Item label='图标内容' layout='vertical' className='import-icon-content'>
+          <Form.Item
+            label="图标内容"
+            layout="vertical"
+            className="import-icon-content"
+          >
             {file?.content && (
-              <div className='import-icon-preview' dangerouslySetInnerHTML={{ __html: file.content || '' }}></div>
+              <div
+                className="import-icon-preview"
+                dangerouslySetInnerHTML={{__html: file.content || ''}}
+              ></div>
             )}
           </Form.Item>
         </Modal>

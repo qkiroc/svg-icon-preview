@@ -1,13 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import importIcon from './iconImport';
+import actions from './actions';
 
-interface iconConfigProps {
-  name: string;
-  iconPath: string;
-  iconDir: string;
-}
 interface iconConfigList extends iconConfigProps {
   rootPath: string;
   icons: IconProps[];
@@ -15,6 +10,8 @@ interface iconConfigList extends iconConfigProps {
 
 class IconViewProvider implements vscode.WebviewViewProvider {
   private iconConfigList: iconConfigList[] = [];
+  private rootPath: string = '';
+  private iconConfig: iconConfigProps[] = [];
   private view?: vscode.WebviewView;
   private currentIconConfig?: iconConfigList;
   private search: string = '';
@@ -76,36 +73,32 @@ class IconViewProvider implements vscode.WebviewViewProvider {
       const data = message.data;
       switch (message.type) {
         case 'view': {
-          // 打开svg文件
-          vscode.workspace.openTextDocument(data.iconAPath).then(doc => {
+          const p = data.rootPath
+            ? path.join(data.rootPath, data.path)
+            : data.path;
+          // 打开文件
+          vscode.workspace.openTextDocument(p).then(doc => {
             // 在VSCode编辑窗口展示读取到的文本
             vscode.window.showTextDocument(doc);
           });
           break;
         }
         case 'delete': {
-          vscode.commands.executeCommand('svgIconList.delete', data);
+          try {
+            actions.deleteIcon(data);
+            this.messageSuccess('删除成功');
+          } catch (error) {
+            this.messageError('删除失败');
+          }
           break;
         }
         case 'importIcon': {
           try {
-            importIcon(data);
+            actions.importIcon(data);
             this.search = data.name;
-            this.postMessage({
-              type: 'toast',
-              data: {
-                status: 'success',
-                message: '导入成功'
-              }
-            });
+            this.messageSuccess('导入成功');
           } catch (error) {
-            this.postMessage({
-              type: 'toast',
-              data: {
-                status: 'error',
-                message: '导入失败'
-              }
-            });
+            this.messageError('导入失败');
           }
           break;
         }
@@ -137,13 +130,17 @@ class IconViewProvider implements vscode.WebviewViewProvider {
    */
   private getAllSvgIcon(uri: string) {
     const files = fs.readdirSync(uri);
-    const svgList: { aPath: string; name: string; svg: string }[] = [];
+    const svgList: {aPath: string; name: string; svg: string}[] = [];
     files.forEach(fileName => {
       const filePath = path.join(uri, fileName);
       const stat = fs.lstatSync(filePath);
       if (stat.isFile()) {
         if (fileName.endsWith('.svg')) {
-          svgList.push({ aPath: filePath, name: fileName, svg: fs.readFileSync(filePath, 'utf8') });
+          svgList.push({
+            aPath: filePath,
+            name: fileName,
+            svg: fs.readFileSync(filePath, 'utf8')
+          });
         }
       } else {
         svgList.push(...this.getAllSvgIcon(filePath));
@@ -160,17 +157,29 @@ class IconViewProvider implements vscode.WebviewViewProvider {
     try {
       rootWorkspace?.forEach(workspaceFolder => {
         const uri = workspaceFolder.uri.path;
-        const iconConfigFile = fs.readFileSync(path.join(uri, '.vscode/iconConfig.json'), 'utf-8');
+        this.rootPath = uri;
+        const iconConfigFile = fs.readFileSync(
+          path.join(uri, '.vscode/iconConfig.json'),
+          'utf-8'
+        );
         if (iconConfigFile) {
           const iconConfig = JSON.parse(iconConfigFile);
+          this.iconConfig = iconConfig;
           iconConfig.forEach((info: iconConfigProps) => {
             // 获取已经注册的图标信息
             const iconPath = path.join(uri, info.iconPath);
             const code = fs.readFileSync(path.join(iconPath), 'utf8');
             const codeIconList = code.match(/import .* from '.*\.svg'/g);
-            const codeRegisterIconList = code.match(/registerIcon\('(.*)', (.*)\)/g);
+            const codeRegisterIconList = code.match(
+              /registerIcon\('(.*)', (.*)\)/g
+            );
             const iconList: IconProps[] = [];
-            if (codeIconList && codeIconList.length > 0 && codeRegisterIconList && codeRegisterIconList.length > 0) {
+            if (
+              codeIconList &&
+              codeIconList.length > 0 &&
+              codeRegisterIconList &&
+              codeRegisterIconList.length > 0
+            ) {
               const registerIconInfo: any = {};
               codeRegisterIconList.forEach(code => {
                 const info = /registerIcon\('(.*)', (.*)\)/.exec(code);
@@ -197,7 +206,9 @@ class IconViewProvider implements vscode.WebviewViewProvider {
             this.iconConfigList.push({
               rootPath: uri,
               icons: allIcon.map(svg => {
-                const icon = iconList.find(item => item.aPath === svg.aPath) || { unRegister: true, name: svg.name };
+                const icon = iconList.find(
+                  item => item.aPath === svg.aPath
+                ) || {unRegister: true, name: svg.name};
                 return {
                   aPath: svg.aPath,
                   svg: svg.svg,
@@ -217,7 +228,13 @@ class IconViewProvider implements vscode.WebviewViewProvider {
    * 绘制html
    */
   private getWebviewContent(config?: iconConfigList) {
-    const { icons, name: projectName, iconPath: configPath, rootPath, iconDir } = config || {};
+    const {
+      icons,
+      name: projectName,
+      iconPath: configPath,
+      rootPath,
+      iconDir
+    } = config || {};
     const iconList = icons?.map(icon => {
       return {
         ...icon
@@ -227,8 +244,9 @@ class IconViewProvider implements vscode.WebviewViewProvider {
     return this.html(iconList, {
       projectName,
       configPath,
-      rootPath,
-      iconDir
+      rootPath: rootPath || this.rootPath,
+      iconDir,
+      iconConfig: this.iconConfig
     });
   }
 
@@ -265,6 +283,26 @@ class IconViewProvider implements vscode.WebviewViewProvider {
         this.reload();
       }, 1000);
     }
+  }
+
+  public messageSuccess(message: string) {
+    this.postMessage({
+      type: 'toast',
+      data: {
+        status: 'success',
+        message
+      }
+    });
+  }
+
+  public messageError(message: string) {
+    this.postMessage({
+      type: 'toast',
+      data: {
+        status: 'error',
+        message
+      }
+    });
   }
 }
 

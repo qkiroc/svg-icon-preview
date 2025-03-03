@@ -22,11 +22,18 @@ interface MessageIconInfo {
   rootPath: string;
 }
 
+interface iconConfigProps {
+  name: string;
+  iconPath: string;
+  iconDir: string;
+}
+
 interface ProjectConfig {
   projectName?: string;
   configPath?: string;
   rootPath?: string;
   iconDir?: string;
+  iconConfig?: iconConfigProps[];
 }
 
 type messageType = 'view' | 'delete' | 'importIcon';

@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { Config, optimize } from 'svgo';
-import { camelCase, upperFirst } from 'lodash';
+import {Config, optimize} from 'svgo';
+import {camelCase, upperFirst} from 'lodash';
 
 // 配置 SVGO 插件
 const defaultPlugins: Config['plugins'] = [
@@ -39,15 +39,18 @@ const defaultPlugins: Config['plugins'] = [
   }
 ];
 
-export default function importIcon(data: { name: string; content: string; needColor: boolean } & ProjectConfig) {
-  const { name, content, needColor, projectName, configPath, rootPath, iconDir } = data;
+export default function importIcon(
+  data: {name: string; content: string; needColor: boolean} & ProjectConfig
+) {
+  const {name, content, needColor, projectName, configPath, rootPath, iconDir} =
+    data;
   // 在iconDir下创建一个新的svg文件
   const iconPath = path.join(rootPath!, iconDir!, name + '.svg');
   let plugins = [...defaultPlugins!];
   if (!needColor) {
     plugins?.push({
       name: 'convertColors',
-      params: { currentColor: true }
+      params: {currentColor: true}
     });
   }
   // 优化svg
@@ -61,13 +64,22 @@ export default function importIcon(data: { name: string; content: string; needCo
 
   const configAPath = path.join(rootPath!, configPath!);
   let code = fs.readFileSync(configAPath, 'utf-8');
-  const iconImport = `import ${className} from './${path.relative(path.join(rootPath!, iconDir!), iconPath)}';`;
+  let iconRelativePath = path.relative(
+    path.dirname(path.join(rootPath!, configPath!)),
+    iconPath
+  );
+  iconRelativePath = iconRelativePath.startsWith('.')
+    ? iconRelativePath
+    : './' + iconRelativePath;
+  const iconImport = `import ${className} from '${iconRelativePath}';`;
   const iconRegister = `registerIcon('${name}', ${className});`;
 
   const iconList = code.split('\n').reverse();
 
   // 在最后一个import语句之后插入新的import语句
-  let index = iconList.findIndex(item => item.startsWith('import'));
+  let index = iconList.findIndex(
+    item => item.startsWith('import') && item.endsWith(".svg';")
+  );
   if (index === -1) {
     index = 0;
   }

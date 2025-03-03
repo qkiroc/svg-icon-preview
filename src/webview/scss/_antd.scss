@@ -1,8 +1,11 @@
-.ant-popover {
-  .ant-popover-inner {
+.ant-popover,
+.ant-tooltip-content {
+  .ant-popover-inner,
+  .ant-tooltip-inner {
     padding: 6px 12px;
     border-radius: 6px;
     font-size: 12px;
+    min-height: initial;
   }
 }
 .ant-form-item {
@@ -28,4 +31,11 @@
 
 .ant-switch.ant-switch-checked .ant-switch-handle {
   inset-inline-start: calc(100% - 16px);
+}
+
+.ant-form-item-label {
+  flex: 0 0 80px !important;
+}
+.ant-form-item-control {
+  flex: 1 !important;
 }

@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import Menu from './components/Menu';
 import ImportIcon from './components/ImpotIcon';
 import cx from 'classnames';
 import message from 'antd/es/message';
 import Input from 'antd/es/input';
-import Empty from 'antd/es/empty';
+import Empty from './components/Empty';
 
-const { Search } = Input;
+const {Search} = Input;
 
 export default function App() {
   const icons = window.icons || [];
@@ -71,44 +71,54 @@ export default function App() {
 
   return (
     <>
-      <div className='icon-header'>
-        <div className='icon-header-title'>图标列表</div>
-        <ImportIcon />
+      <div className="icon-header">
+        <div className="icon-header-title">图标列表</div>
+        {icons.length > 0 && <ImportIcon />}
       </div>
-      <div className='icon-search'>
-        <Search
-          value={search}
-          className='icon-search-wrapper'
-          placeholder='输入图标key搜索'
-          allowClear
-          onChange={handleSearch}
-        />
-      </div>
+      {icons.length > 0 && (
+        <div className="icon-search">
+          <Search
+            value={search}
+            className="icon-search-wrapper"
+            placeholder="输入图标key搜索"
+            allowClear
+            onChange={handleSearch}
+          />
+        </div>
+      )}
       {icons.length > 0 ? (
-        <div className='icon-list'>
+        <div className="icon-list">
           {icons
             .filter((icon: any) => icon.name.includes(search))
             .map(icon => {
               return (
                 <div
-                  data-role='icon-list-item'
+                  data-role="icon-list-item"
                   key={icon.aPath}
-                  className={cx('icon-list-item', icon.unRegister && 'icon-list-item--unregister')}
+                  className={cx(
+                    'icon-list-item',
+                    icon.unRegister && 'icon-list-item--unregister'
+                  )}
                   onClick={() => handleCopy(icon)}
                   onContextMenu={e => {
                     e.preventDefault();
-                    handleContextMenu({ iconInfo: icon, target: e.currentTarget });
-                  }}>
-                  <div dangerouslySetInnerHTML={{ __html: icon.svg || '' }} className='icon-list-item-svg'></div>
-                  <div className='icon-list-item-name'>{icon.name}</div>
+                    handleContextMenu({
+                      iconInfo: icon,
+                      target: e.currentTarget
+                    });
+                  }}
+                >
+                  <div
+                    dangerouslySetInnerHTML={{__html: icon.svg || ''}}
+                    className="icon-list-item-svg"
+                  ></div>
+                  <div className="icon-list-item-name">{icon.name}</div>
                 </div>
               );
             })}
         </div>
       ) : (
-        <div className='empty'>
-          <Empty description='未检查到可用图标' />
-        </div>
+        <Empty />
       )}
       {menuInfo && <Menu menuInfo={menuInfo} />}
     </>

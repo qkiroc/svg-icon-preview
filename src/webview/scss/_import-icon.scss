@@ -23,6 +23,9 @@
   }
 }
 .import-icon-content {
+  .ant-form-item-label {
+    flex: inherit !important;
+  }
   .ant-form-item-control {
     flex: initial;
   }
