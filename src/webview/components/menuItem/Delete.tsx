@@ -2,7 +2,7 @@ import React from 'react';
 import MenuItem from './MenuItem';
 import Modal from 'antd/es/modal';
 
-export default function View(props: {menuInfo: MenuInfo}) {
+export default function Delete(props: {menuInfo: MenuInfo}) {
   const projectConfig = window.projectConfig!;
   const {menuInfo} = props;
   const modalRef = React.useRef<any>();

@@ -43,11 +43,13 @@ class IconViewProvider implements vscode.WebviewViewProvider {
   /**
    * 刷新视图
    */
-  public reload() {
+  public reload(reset: boolean = true) {
+    if (reset) {
+      this.search = '';
+    }
     this.iconConfigList = [];
     this.getIconConfig();
     this.render();
-    this.search = '';
   }
 
   /**
@@ -72,7 +74,7 @@ class IconViewProvider implements vscode.WebviewViewProvider {
   private receiveMessage() {
     this.view!.webview.onDidReceiveMessage(message => {
       const data = message.data;
-      switch (message.type) {
+      switch (message.type as messageType) {
         case 'view': {
           const p = data.rootPath
             ? path.join(data.rootPath, data.path)
@@ -96,10 +98,33 @@ class IconViewProvider implements vscode.WebviewViewProvider {
         case 'importIcon': {
           try {
             actions.importIcon(data);
-            this.search = data.name;
+            this.search = data.map((item: any) => item.name).join(',');
             this.messageSuccess('导入成功');
           } catch (error) {
             this.messageError('导入失败');
+          }
+          break;
+        }
+        case 'search': {
+          this.search = data;
+          break;
+        }
+        case 'optimization': {
+          try {
+            const res = actions.optimization(data);
+            this.reload(false);
+            vscode.workspace.openTextDocument(data.iconAPath).then(doc => {
+              // 在VSCode编辑窗口展示读取到的文本
+              vscode.window.showTextDocument(doc);
+
+              setTimeout(() => {
+                this.messageSuccess(
+                  `优化成功，体积从 ${res.beforeSize}KB 减少到 ${res.afterSize}KB，优化率 ${res.optimizationRate}% `
+                );
+              }, 1000);
+            });
+          } catch (error) {
+            this.messageError('优化失败');
           }
           break;
         }

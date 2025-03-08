@@ -36,4 +36,4 @@ interface ProjectConfig {
   iconConfig?: iconConfigProps[];
 }
 
-type messageType = 'view' | 'delete' | 'importIcon';
+type messageType = 'view' | 'delete' | 'importIcon' | 'search' | 'optimization';

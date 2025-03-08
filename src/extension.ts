@@ -45,6 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
       ) {
         if (decorationProvider) {
           decorationProvider.updateDecorations(vscode.window.activeTextEditor);
+          iconViewProvider.reload(false);
         }
       }
     },

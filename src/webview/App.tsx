@@ -16,6 +16,10 @@ export default function App() {
   function handleSearch(e: any) {
     const value = e.target.value;
     setSearch(value);
+    window.vscode.postMessage({
+      type: 'search',
+      data: value
+    });
   }
 
   function handleCopy(icon: IconProps) {
@@ -89,7 +93,17 @@ export default function App() {
       {icons.length > 0 ? (
         <div className="icon-list">
           {icons
-            .filter((icon: any) => icon.name.includes(search))
+            .filter((icon: any) => {
+              const searchList = search?.split(',');
+
+              if (!searchList || searchList.length === 0) {
+                return true;
+              }
+              if (searchList.some((item: string) => icon.name.includes(item))) {
+                return true;
+              }
+              return false;
+            })
             .map(icon => {
               return (
                 <div

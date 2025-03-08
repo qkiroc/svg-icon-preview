@@ -1,12 +1,13 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {useLayoutEffect, useMemo, useRef, useState} from 'react';
 import View from './menuItem/View';
 import Delete from './menuItem/Delete';
+import Optimization from './menuItem/Optimization';
 
-export default function Menu(props: { menuInfo: MenuInfo }) {
-  const { menuInfo } = props;
+export default function Menu(props: {menuInfo: MenuInfo}) {
+  const {menuInfo} = props;
   const target = menuInfo.target;
   const menuRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ left: 0, top: 0 });
+  const [position, setPosition] = useState({left: 0, top: 0});
 
   useLayoutEffect(() => {
     if (target && menuRef.current) {
@@ -26,19 +27,21 @@ export default function Menu(props: { menuInfo: MenuInfo }) {
       if (top + height > window.innerHeight) {
         top = top - height;
       }
-      setPosition({ left, top });
+      setPosition({left, top});
     }
   }, [target]);
 
   return (
     <div
-      className='icon-menu'
+      className="icon-menu"
       ref={menuRef}
       style={{
         top: position.top,
         left: position.left
-      }}>
+      }}
+    >
       <View menuInfo={menuInfo} />
+      <Optimization menuInfo={menuInfo} />
       <Delete menuInfo={menuInfo} />
     </div>
   );
