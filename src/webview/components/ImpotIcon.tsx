@@ -23,7 +23,10 @@ export default function ImportIcon() {
     if (!files) {
       return;
     }
-    let filesArr = [];
+    let filesArr: {
+      name: string;
+      content: string;
+    }[] = [];
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const name = file.name.replace(/.svg|.SVG$/, '');
