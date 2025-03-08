@@ -3,7 +3,7 @@
 	"displayName": "amis 项目图标预览",
 	"description": "amis 项目图标预览",
 	"publisher": "qkiroc",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"engines": {
 		"vscode": "^1.46.0"
 	},
@@ -82,7 +82,8 @@
 		"lint": "eslint src --ext ts",
 		"test": "node ./out/test/runTest.js",
 		"vite-watch": "vite build --watch",
-		"vite-build": "vite build"
+		"vite-build": "vite build",
+		"publish": "vsce publish"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.3",

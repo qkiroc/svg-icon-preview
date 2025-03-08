@@ -10,12 +10,13 @@ export default function optimizeIcon(data: MessageIconInfo) {
   });
   fs.writeFileSync(iconAPath, result.data, 'utf8');
 
-  // 计算优化前后的大小
-  const beforeSize = code.length;
-  const afterSize = result.data.length;
-  const optimizationRate = Math.round(
-    ((beforeSize - afterSize) / beforeSize) * 100
-  );
+  // 计算优化前后的大小，单位转化为KB
+  const beforeSize = (code.length / 1024).toFixed(2);
+  const afterSize = (result.data.length / 1024).toFixed(2);
+  const optimizationRate = (
+    ((code.length - result.data.length) / code.length) *
+    100
+  ).toFixed(2);
   return {
     beforeSize,
     afterSize,
