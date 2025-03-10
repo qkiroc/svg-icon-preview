@@ -2,9 +2,21 @@ import * as vscode from 'vscode';
 import IconViewProvider from './IconViewProvider';
 import {amisIcons} from './amis-icons';
 
+export let decorationProvider: SvgDecorationProvider | undefined;
+
 export class SvgDecorationProvider {
   private activeDecorations: vscode.TextEditorDecorationType[] = [];
   private iconProvider: IconViewProvider;
+
+  public static create(
+    iconProvider: IconViewProvider,
+    editor: vscode.TextEditor
+  ) {
+    if (!decorationProvider) {
+      decorationProvider = new SvgDecorationProvider(iconProvider, editor);
+    }
+    decorationProvider.updateDecorations(editor);
+  }
 
   constructor(iconProvider: IconViewProvider, editor?: vscode.TextEditor) {
     this.iconProvider = iconProvider;
@@ -129,5 +141,19 @@ export class SvgDecorationProvider {
       // 返回一个简单的占位SVG
       return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" fill="#ff0000" opacity="0.3"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="8">错误</text></svg>';
     }
+  }
+}
+
+// 判断是否是tsx文件
+function isTsxFile(document: vscode.TextDocument): boolean {
+  return document.languageId === 'typescriptreact';
+}
+
+export function showSvgDecoration(
+  editor: vscode.TextEditor | undefined,
+  iconProvider: IconViewProvider
+) {
+  if (editor?.document && isTsxFile(editor.document)) {
+    SvgDecorationProvider.create(iconProvider, editor);
   }
 }

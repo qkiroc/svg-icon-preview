@@ -1,52 +1,41 @@
 import * as vscode from 'vscode';
-import {SvgDecorationProvider} from './SvgDecorationProvider';
+import {decorationProvider, showSvgDecoration} from './svgDecorationProvider';
 import IconViewProvider from './IconViewProvider';
+import {showSvgPreview} from './showSvgPreview';
 
 export function activate(context: vscode.ExtensionContext) {
   // 创建图标视图提供程序
   const iconViewProvider = new IconViewProvider(context.extensionUri);
 
-  // 创建SVG装饰提供程序
-  let decorationProvider: SvgDecorationProvider | undefined;
-
-  // 初始化装饰
   if (vscode.window.activeTextEditor) {
-    decorationProvider = new SvgDecorationProvider(
-      iconViewProvider,
-      vscode.window.activeTextEditor
-    );
+    showSvgDecoration(vscode.window.activeTextEditor, iconViewProvider);
+    showSvgPreview(vscode.window.activeTextEditor?.document);
   }
 
   // 文档变更时更新装饰
   vscode.window.onDidChangeActiveTextEditor(
     editor => {
       if (editor) {
-        if (!decorationProvider) {
-          decorationProvider = new SvgDecorationProvider(
-            iconViewProvider,
-            editor
-          );
-        } else {
-          decorationProvider.updateDecorations(editor);
-        }
+        showSvgDecoration(editor, iconViewProvider);
+        showSvgPreview(editor?.document);
+        iconViewProvider.render();
       }
-      iconViewProvider.render();
     },
     null,
     context.subscriptions
   );
 
-  // 文档内容变化时更新装饰
+  // 文档内容变化时更新装饰和预览
   vscode.workspace.onDidChangeTextDocument(
     event => {
       if (
         vscode.window.activeTextEditor &&
         event.document === vscode.window.activeTextEditor.document
       ) {
-        if (decorationProvider) {
-          decorationProvider.updateDecorations(vscode.window.activeTextEditor);
-          iconViewProvider.reload(false);
-        }
+        showSvgDecoration(vscode.window.activeTextEditor, iconViewProvider);
+        // 如果是SVG文件，自动更新预览
+        showSvgPreview(event.document);
+        iconViewProvider.reload(false);
       }
     },
     null,

@@ -5,6 +5,7 @@ import cx from 'classnames';
 import message from 'antd/es/message';
 import Input from 'antd/es/input';
 import Empty from './components/Empty';
+import {optimizeIcon, viewFile} from './helper';
 
 const {Search} = Input;
 
@@ -41,6 +42,18 @@ export default function App() {
     document.execCommand('copy');
     document.body.removeChild(input);
     message.success('复制成功');
+  }
+
+  function handleClick(e: React.MouseEvent, icon: IconProps) {
+    if (e.shiftKey) {
+      viewFile(icon);
+      return;
+    } else if (e.metaKey) {
+      optimizeIcon(icon);
+      return;
+    } else {
+      handleCopy(icon);
+    }
   }
 
   // 右键唤起菜单
@@ -113,7 +126,7 @@ export default function App() {
                     'icon-list-item',
                     icon.unRegister && 'icon-list-item--unregister'
                   )}
-                  onClick={() => handleCopy(icon)}
+                  onClick={e => handleClick(e, icon)}
                   onContextMenu={e => {
                     e.preventDefault();
                     handleContextMenu({
