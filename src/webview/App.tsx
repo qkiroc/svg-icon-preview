@@ -28,7 +28,7 @@ export default function App() {
       message.error('该图标未注册');
       return;
     }
-    const value = `<Icon icon="${icon.name}" className="icon" />`;
+    const value = `<Icon icon="${icon.name}" />`;
     if (typeof navigator.clipboard.writeText === 'function') {
       navigator.clipboard.writeText(value).then(() => {
         message.success('复制成功');

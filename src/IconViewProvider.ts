@@ -306,7 +306,7 @@ class IconViewProvider implements vscode.WebviewViewProvider {
     this.view!.webview.postMessage(message);
     if (message.type === 'toast' && message.data.status === 'success') {
       setTimeout(() => {
-        this.reload();
+        this.reload(false);
       }, 1000);
     }
   }
