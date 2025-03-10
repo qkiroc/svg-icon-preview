@@ -1,0 +1,21 @@
+.icon-menu {
+  border-radius: 6px;
+  width: 100px;
+  position: fixed;
+  background-color: #fff;
+  overflow: hidden;
+  &-item {
+    height: 32px;
+    line-height: 32px;
+    padding: 0 10px;
+    cursor: pointer;
+    color: #333;
+    &:hover {
+      background-color: #f0f0f0;
+      color: #2468f2;
+    }
+  }
+}
+.delete {
+  color: #f5222d;
+}

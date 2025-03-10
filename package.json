@@ -1,9 +1,9 @@
 {
-	"name": "svg-icon-preview",
-	"displayName": "svg icon preview",
-	"description": "",
-	"publisher": "qhy",
-	"version": "0.0.1",
+	"name": "amis-icon-preview",
+	"displayName": "amis 项目图标预览",
+	"description": "amis 项目图标预览",
+	"publisher": "qkiroc",
+	"version": "1.3.1",
 	"engines": {
 		"vscode": "^1.46.0"
 	},
@@ -11,7 +11,8 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:svgPreview.showSvgList"
+		"onLanguage:typescriptreact",
+		"onLanguage:xml"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
@@ -19,46 +20,102 @@
 			{
 				"command": "svgPreview.showSvgList",
 				"title": "展示图标列表"
+			},
+			{
+				"command": "svgPreview.reload",
+				"title": "刷新列表",
+				"icon": "media/reload.svg"
+			},
+			{
+				"command": "svgPreview.openRegisterFile",
+				"title": "打开图标注册文件",
+				"icon": "media/file.svg"
 			}
 		],
-		"menus": {
-			"editor/context": [
+		"viewsContainers": {
+			"activitybar": [
 				{
-					"command": "svgPreview.showSvgList",
-					"group": "1_modification"
+					"id": "svgIconList",
+					"title": "图标列表",
+					"icon": "media/icon.svg"
+				}
+			]
+		},
+		"views": {
+			"svgIconList": [
+				{
+					"type": "webview",
+					"id": "svgIconList",
+					"name": "svgIconList"
+				}
+			],
+			"explorer": [
+				{
+					"type": "webview",
+					"id": "explorer-svgIconList",
+					"name": "图标列表"
+				}
+			]
+		},
+		"menus": {
+			"view/title": [
+				{
+					"command": "svgPreview.reload",
+					"group": "navigation",
+					"when": "view === svgIconList"
 				},
 				{
-					"command": "svgPreview.showSvgList",
-					"group": "navigation"
+					"command": "svgPreview.openRegisterFile",
+					"group": "navigation",
+					"when": "view === svgIconList"
 				}
 			]
 		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",
-		"compile": "webpack --devtool nosources-source-map --config ./build/node-extension.webpack.config.js",
-		"watch": "webpack --watch --devtool nosources-source-map --info-verbosity verbose --config ./build/node-extension.webpack.config.js",
-		"package": "webpack --mode production --config ./build/node-extension.webpack.config.js",
+		"compile": "webpack --devtool nosources-source-map --config ./build/node-extension.webpack.config.js && npm run vite-build",
+		"watch": "webpack --watch --devtool nosources-source-map --info-verbosity verbose --config ./build/node-extension.webpack.config.js & npm run vite-watch",
+		"package": "webpack --mode production --config ./build/node-extension.webpack.config.js && npm run vite-build",
 		"test-compile": "tsc -p ./",
 		"test-watch": "tsc -watch -p ./",
 		"pretest": "npm run test-compile && npm run lint",
 		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js"
+		"test": "node ./out/test/runTest.js",
+		"vite-watch": "vite build --watch",
+		"vite-build": "vite build",
+		"publish": "vsce publish"
 	},
 	"devDependencies": {
-		"@types/vscode": "^1.46.0",
 		"@types/glob": "^7.1.3",
+		"@types/lodash": "^4.17.15",
 		"@types/mocha": "^8.0.0",
 		"@types/node": "^12.11.7",
-		"eslint": "^7.9.0",
+		"@types/react": "^18.0.0",
+		"@types/react-dom": "^18.0.0",
+		"@types/svgo": "^2.6.4",
+		"@types/vscode": "^1.46.0",
 		"@typescript-eslint/eslint-plugin": "^4.1.1",
 		"@typescript-eslint/parser": "^4.1.1",
+		"@vitejs/plugin-react": "^4.3.4",
+		"antd": "^5.24.2",
+		"classnames": "^2.5.1",
+		"eslint": "^7.9.0",
 		"glob": "^7.1.6",
+		"lodash": "^4.17.21",
 		"mocha": "^8.1.3",
-		"typescript": "^4.0.2",
-		"vscode-test": "^1.4.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"sass": "^1.85.1",
 		"ts-loader": "^8.0.3",
+		"typescript": "^4.9.5",
+		"vite": "^6.2.0",
+		"vite-plugin-sass": "^0.1.0",
+		"vscode-test": "^1.4.0",
 		"webpack": "^4.44.1",
 		"webpack-cli": "^3.3.12"
+	},
+	"dependencies": {
+		"svgo": "^3.3.2"
 	}
 }

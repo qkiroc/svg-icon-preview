@@ -1,0 +1,128 @@
+.icon-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px 0;
+  &-title {
+    font-size: 20px;
+    color: var(--vscode-editor-foreground);
+  }
+}
+.icon-search {
+  margin-bottom: 20px;
+  .icon-search-wrapper {
+    .ant-input-affix-wrapper,
+    .ant-btn {
+      background: transparent !important;
+      border-color: var(--vscode-editor-foreground) !important;
+    }
+    .ant-btn-icon,
+    .anticon {
+      color: var(--vscode-editor-foreground) !important;
+    }
+    input {
+      font-size: 12px !important;
+      line-height: 32px;
+      color: var(--vscode-editor-foreground) !important;
+    }
+    input::placeholder {
+      color: var(--vscode-editor-foreground) !important;
+    }
+  }
+}
+.icon-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  grid-column-gap: 16px;
+  gap: 10px;
+  &-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    &:hover {
+      background-color: #4c4954;
+    }
+    &-svg {
+      svg {
+        width: 20px;
+        height: 20px;
+        color: var(--vscode-editor-foreground);
+      }
+
+      margin-bottom: 10px;
+    }
+    &-name {
+      font-size: 12px;
+      width: 100%;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      user-select: none;
+    }
+  }
+  &-item--unregister {
+    position: relative;
+
+    .icon-list-item-name {
+      color: #ff4d4f;
+    }
+    &:hover {
+      &:after {
+        content: '未注册';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        font-size: 12px;
+      }
+    }
+  }
+}
+.empty {
+  height: 100%;
+  width: 100%;
+  .ant-empty-image {
+    opacity: 0.9;
+  }
+  .ant-empty-description {
+    color: var(--vscode-editor-foreground);
+    font-size: 12px;
+    margin-top: 20px;
+  }
+  &-tip-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    &-button {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      height: 32px;
+      line-height: 32px;
+      border: 1px solid var(--vscode-editor-foreground);
+      color: var(--vscode-editor-foreground);
+      background: transparent;
+      border-radius: 6px;
+      padding: 0 16px;
+      margin-top: 16px;
+      cursor: pointer;
+      max-width: 100%;
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+}

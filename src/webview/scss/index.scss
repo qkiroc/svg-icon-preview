@@ -1,0 +1,17 @@
+@use './icon-list';
+@use './menu';
+@use './import-icon';
+@use './antd';
+.icon {
+  color: var(--vscode-editor-foreground);
+  width: 16px;
+  height: 16px;
+  &:hover {
+    color: #2468f2;
+  }
+}
+
+.important {
+  color: #f5222d;
+  margin: 0 4px;
+}

@@ -1,0 +1,41 @@
+.ant-popover,
+.ant-tooltip-content {
+  .ant-popover-inner,
+  .ant-tooltip-inner {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    min-height: initial;
+  }
+}
+.ant-form-item {
+  margin-bottom: 10px;
+}
+
+.ant-form-item .ant-form-item-label > label {
+  font-size: 12px;
+}
+
+.ant-input,
+.ant-btn {
+  font-size: 12px;
+}
+
+.ant-switch {
+  height: 18px;
+  & &-handle {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.ant-switch.ant-switch-checked .ant-switch-handle {
+  inset-inline-start: calc(100% - 16px);
+}
+
+.ant-form-item-label {
+  flex: 0 0 80px !important;
+}
+.ant-form-item-control {
+  flex: 1 !important;
+}
