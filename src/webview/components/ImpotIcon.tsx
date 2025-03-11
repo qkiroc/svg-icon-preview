@@ -1,12 +1,20 @@
 import Popover from 'antd/es/popover';
 import CreateIcon from '../icons/CreateIcon';
 import Modal from 'antd/es/modal';
-import React from 'react';
+import React, {useImperativeHandle} from 'react';
 import Form from 'antd/es/form';
 import Input from 'antd/es/input';
 import Switch from 'antd/es/switch';
+import message from 'antd/es/message';
 
-export default function ImportIcon() {
+export interface ImportIconRefProps {
+  onImport: (files: FileList | null) => void;
+}
+
+export default React.forwardRef<ImportIconRefProps, {}>(function ImportIcon(
+  {},
+  ref
+) {
   const projectConfig = window.projectConfig!;
   const icons = window.icons || [];
   const [showModal, setShowModal] = React.useState(false);
@@ -18,8 +26,7 @@ export default function ImportIcon() {
     }[]
   >();
 
-  function handleImportIcon(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = e.target.files;
+  function handleImportIcon(files: FileList | null) {
     if (!files) {
       return;
     }
@@ -29,7 +36,12 @@ export default function ImportIcon() {
     }[] = [];
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const name = file.name.replace(/.svg|.SVG$/, '');
+      const ext = file.name.split('.').pop();
+      if (ext !== 'svg' && ext !== 'SVG') {
+        message.error(`${file.name} 不是svg文件`);
+        continue;
+      }
+      const name = file.name.slice(0, -4);
       const reader = new FileReader();
       reader.readAsText(file);
       reader.onload = function () {
@@ -63,6 +75,10 @@ export default function ImportIcon() {
     setShowModal(false);
   }
 
+  useImperativeHandle(ref, () => ({
+    onImport: handleImportIcon
+  }));
+
   return (
     <>
       <Popover content="导入图标" placement="left" className="popover">
@@ -70,7 +86,7 @@ export default function ImportIcon() {
           <input
             type="file"
             accept=".svg"
-            onChange={handleImportIcon}
+            onChange={e => handleImportIcon(e.target.files)}
             multiple
           />
           <CreateIcon />
@@ -182,4 +198,4 @@ export default function ImportIcon() {
       )}
     </>
   );
-}
+});

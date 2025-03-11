@@ -1,6 +1,7 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 import Menu from './components/Menu';
 import ImportIcon from './components/ImpotIcon';
+import type {ImportIconRefProps} from './components/ImpotIcon';
 import cx from 'classnames';
 import message from 'antd/es/message';
 import Input from 'antd/es/input';
@@ -13,6 +14,7 @@ export default function App() {
   const icons = window.icons || [];
   const [search, setSearch] = React.useState(window.search);
   const [menuInfo, setMenuInfo] = React.useState<MenuInfo>();
+  const importRef = useRef<ImportIconRefProps>(null);
 
   function handleSearch(e: any) {
     const value = e.target.value;
@@ -90,7 +92,7 @@ export default function App() {
     <>
       <div className="icon-header">
         <div className="icon-header-title">图标列表</div>
-        {icons.length > 0 && <ImportIcon />}
+        {icons.length > 0 && <ImportIcon ref={importRef} />}
       </div>
       {icons.length > 0 && (
         <div className="icon-search">
@@ -100,6 +102,14 @@ export default function App() {
             placeholder="输入图标key搜索"
             allowClear
             onChange={handleSearch}
+            onPaste={e => {
+              const files = e.clipboardData.files;
+              if (files.length > 0) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+              importRef.current?.onImport(files);
+            }}
           />
         </div>
       )}
