@@ -99,7 +99,7 @@ export default function App() {
           <Search
             value={search}
             className="icon-search-wrapper"
-            placeholder="输入图标key搜索"
+            placeholder="输入图标key搜索(多个用,隔开)，或粘贴svg文件导入图标"
             allowClear
             onChange={handleSearch}
             onPaste={e => {
