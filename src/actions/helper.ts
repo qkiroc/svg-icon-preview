@@ -1,4 +1,5 @@
 import type {Config} from 'svgo';
+import {v4 as uuidv4} from 'uuid';
 
 // 配置 SVGO 插件
 export const defaultPlugins: Config['plugins'] = [
@@ -27,6 +28,12 @@ export const defaultPlugins: Config['plugins'] = [
     name: 'cleanupIds', // 清理 ID
     params: {
       minify: true // 尽可能地删除不必要的 id
+    }
+  },
+  {
+    name: 'prefixIds', // 专门处理 ID 前缀的插件
+    params: {
+      prefix: `uuid-${uuidv4()}`, 
     }
   },
   {
