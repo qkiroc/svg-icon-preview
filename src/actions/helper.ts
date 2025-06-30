@@ -22,7 +22,7 @@ export const defaultPlugins: Config['plugins'] = [
   'removeUselessDefs', // 移除无用的 defs
   'removeUnusedNS', // 移除未使用的命名空间声明
   'removeXMLProcInst', // 移除 XML 处理指令
-  'removeXMLNS', // 移除 XML 命名空间属性
+  // 'removeXMLNS', // 移除 XML 命名空间属性
   'removeDoctype', // 移除文档类型声明
   {
     name: 'cleanupIds', // 清理 ID
