@@ -33,7 +33,7 @@ export const defaultPlugins: Config['plugins'] = [
   {
     name: 'prefixIds', // 专门处理 ID 前缀的插件
     params: {
-      prefix: `uuid-${uuidv4()}`
+      prefix: () => `uuid-${uuidv4().slice(0, 8)}`,
     }
   },
   {
